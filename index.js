@@ -14,7 +14,7 @@ mongoose.connect("mongodb://localhost:27017/shopDB");
 
 app.use("/api/users",userRoute);
 app.use("/api/auth",authRoute);
-app.use("api/products",productRoute)
+app.use("/api/products",productRoute)
 
 
 app.listen(3000, ()=>{
