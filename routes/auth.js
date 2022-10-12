@@ -27,10 +27,18 @@ const jwt = require("jsonwebtoken")
  router.post("/login", async(req,res)=>{
     try{
        
-       const user = await User.findOne({username: req.body.username});
+       var user = await User.findOne({email: req.body.email});
        if(!user){
-        res.status(401).json("Wrong crdentials");
+        res.status(501).json({
+         "success": false,
+         "code": 501,
+         "message": "Wrong Credentials",
+         "response": null
+        });
        }
+       else{
+         
+       
 
        const hashedPassword = CryptoJS.AES.decrypt(user.password, process.env.PASS_SEC).toString(CryptoJS.enc.Utf8);
        console.log(hashedPassword);
@@ -47,15 +55,31 @@ const jwt = require("jsonwebtoken")
           {expiresIn: "3d"}
           );
 
-        const {password, ...others} = user._doc;
-        res.status(201).json({...others,accessToken});
+      //   const {password, ...others} = user._doc;
+      //   res.status(201).json({...others,accessToken});
+      user = user.toObject();
+      user.accessToken = accessToken;
+      delete user.password;
+      console.log(user);
+        res.status(201).json({
+         "success": true,
+         "code":201,
+         "message": "Successfully signed in",
+         "response": user
+        })
        }
        else{
-        res.status(501).json("Incorrct password");
+        res.status(501).json({
+         "success": false,
+         "code": 501,
+         "message": "Wrong Password",
+         "response": null
+        });
        }
     }
+   }
     catch(err){
-
+      console.log(err);
     }
  })
 
