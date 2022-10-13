@@ -12,6 +12,10 @@ const orderRoute = require("./routes/order")
 
 app.use(express.json());
 
+app.get("/test",(req,res)=>{
+    res.send("Hello World")
+})
+
 
 
 mongoose.connect("mongodb://localhost:27017/shopDB");

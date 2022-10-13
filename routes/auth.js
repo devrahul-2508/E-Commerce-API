@@ -13,11 +13,37 @@ const jwt = require("jsonwebtoken")
     });
 
     try{
-        const savedUser = await newUser.save();
-        res.status(201).json(savedUser);
+        let savedUser = await newUser.save();
+
+        const accessToken = jwt.sign({
+         id: savedUser._id,
+         isAdmin: savedUser.isAdmin
+       },process.env.JWT_SEC,
+       {expiresIn: "3d"}
+       );
+
+       savedUser = savedUser.toObject();
+       savedUser.accessToken = accessToken;
+       delete savedUser.password;
+
+
+
+        res.json({
+         "success": true,
+         "code": 200,
+         "message": "Successfully Registered new User",
+         "response": savedUser
+        })
+
     }
     catch(err){
-       res.status(501).json(err);
+      console.log(err);
+      res.json({
+         "success": false,
+         "code": 500,
+         "message": err,
+         "response": null
+       })
     }
 
     
@@ -26,11 +52,22 @@ const jwt = require("jsonwebtoken")
  //LOGIN
  router.post("/login", async(req,res)=>{
     try{
-       
-       const user = await User.findOne({email: req.body.email});
+     
+     var user = await User.findOne({email: req.body.email});
+
+     
+
        if(!user){
-        res.status(401).json("Wrong crdentials");
+        res.json({
+         "success": false,
+         "code": 501,
+         "message": "Wrong Credentials",
+         "response": null
+        });
        }
+       else{
+         
+       
 
        const hashedPassword = CryptoJS.AES.decrypt(user.password, process.env.PASS_SEC).toString(CryptoJS.enc.Utf8);
        console.log(hashedPassword);
@@ -47,15 +84,31 @@ const jwt = require("jsonwebtoken")
           {expiresIn: "3d"}
           );
 
-        const {password, ...others} = user._doc;
-        res.status(201).json({...others,accessToken});
+      //   const {password, ...others} = user._doc;
+      //   res.status(201).json({...others,accessToken});
+      user = user.toObject();
+      user.accessToken = accessToken;
+      delete user.password;
+      console.log(user);
+        res.json({
+         "success": true,
+         "code":201,
+         "message": "Successfully signed in",
+         "response": user
+        })
        }
        else{
-        res.status(501).json("Incorrct password");
+        res.json({
+         "success": false,
+         "code": 501,
+         "message": "Wrong Password",
+         "response": null
+        });
        }
     }
+   }
     catch(err){
-
+      console.log(err);
     }
  })
 
