@@ -13,11 +13,37 @@ const jwt = require("jsonwebtoken")
     });
 
     try{
-        const savedUser = await newUser.save();
-        res.status(201).json(savedUser);
+        let savedUser = await newUser.save();
+
+        const accessToken = jwt.sign({
+         id: savedUser._id,
+         isAdmin: savedUser.isAdmin
+       },process.env.JWT_SEC,
+       {expiresIn: "3d"}
+       );
+
+       savedUser = savedUser.toObject();
+       savedUser.accessToken = accessToken;
+       delete savedUser.password;
+
+
+
+        res.json({
+         "success": true,
+         "code": 200,
+         "message": "Successfully Registered new User",
+         "response": savedUser
+        })
+
     }
     catch(err){
-       res.status(501).json(err);
+      console.log(err);
+      res.json({
+         "success": false,
+         "code": 500,
+         "message": err,
+         "response": null
+       })
     }
 
     
@@ -29,7 +55,7 @@ const jwt = require("jsonwebtoken")
        
        var user = await User.findOne({email: req.body.email});
        if(!user){
-        res.status(501).json({
+        res.json({
          "success": false,
          "code": 501,
          "message": "Wrong Credentials",
@@ -61,7 +87,7 @@ const jwt = require("jsonwebtoken")
       user.accessToken = accessToken;
       delete user.password;
       console.log(user);
-        res.status(201).json({
+        res.json({
          "success": true,
          "code":201,
          "message": "Successfully signed in",
@@ -69,7 +95,7 @@ const jwt = require("jsonwebtoken")
         })
        }
        else{
-        res.status(501).json({
+        res.json({
          "success": false,
          "code": 501,
          "message": "Wrong Password",
