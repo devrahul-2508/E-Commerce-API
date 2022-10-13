@@ -52,8 +52,11 @@ const jwt = require("jsonwebtoken")
  //LOGIN
  router.post("/login", async(req,res)=>{
     try{
-       
-       var user = await User.findOne({email: req.body.email});
+     
+     var user = await User.findOne({email: req.body.email});
+
+     
+
        if(!user){
         res.json({
          "success": false,
