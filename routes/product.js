@@ -52,13 +52,24 @@ router.put("/:id",verifyTokenAndAdmin,async(req,res)=>{
     })
 
     //GET PRODUCT
-    router.get("/find/:id",async (req,res)=>{
+    router.get("/find",async (req,res)=>{
         try{
-            const product = await Product.findById(req.params.id);
+            const product = await Product.findById(req.query.id);
 
-            res.status(200).json(product);
+            res.json({
+              "success": true,
+              "code": 200,
+              "message": "Successfully Fetched Product",
+              "response": product
+             })
         }catch(err){
-            res.status(500).json(err);
+
+          res.json({
+            "success": false,
+            "code": 500,
+            "message": "err",
+            "response": null
+           })
 
         }
     })
