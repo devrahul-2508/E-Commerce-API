@@ -24,6 +24,7 @@ router.post("/", verifyToken, async (req, res) => {
     const price = item.price;
     const title = item.title;
     const img = item.img;
+    const desc= item.desc;
     //If cart already exists for user,
     if (cart) {
       const itemIndex = cart.products.findIndex((item) => item.productId == productId);
@@ -41,7 +42,7 @@ router.post("/", verifyToken, async (req, res) => {
         await cart.save();
         res.status(200).send(cart);
       } else {
-        cart.products.push({ productId, quantity, price,title,img });
+        cart.products.push({ productId, quantity, price,title,img,desc });
         cart.bill = cart.products.reduce((acc, curr) => {
             return acc + curr.quantity * curr.price;
         },0)
@@ -54,7 +55,7 @@ router.post("/", verifyToken, async (req, res) => {
       console.log(quantity*price);
       const newCart = await Cart.create({
         userId: owner,
-        products: [{ productId,quantity, price,title,img }],
+        products: [{ productId,quantity, price,title,img,desc }],
         bill: quantity * price,
       });
       
@@ -114,14 +115,19 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
           });
         } else {
           res.json({
-            "success": false,
-            "code":500,
-            "message": "Cart not found",
+            "success": true,
+            "code":200,
+            "message": "Cart is Empty",
             "response": null
           })
         }
       } catch (error) {
-        res.status(500).send();
+        res.json({
+          "success": false,
+          "code":500,
+          "message": "Some error occured",
+          "response": null
+        });
       }
     });
 

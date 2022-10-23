@@ -15,6 +15,7 @@ const CartSchema = new mongoose.Schema(
           type: Schema.Types.ObjectId, ref: "Product",
         },
         title: String,
+        desc: String,
         img: String,
         quantity: {
           type: Number,
