@@ -37,10 +37,22 @@ router.post("/", verifyToken, async (req, res) => {
         cart.bill = cart.products.reduce((acc, curr) => {
             return acc + curr.quantity * curr.price;
         },0)
+
+        if(product.quantity === 0){
+          cart.products.splice(itemIndex,1)
+        }
+        else{
+          cart.products[itemIndex] = product;
+        }
         
-        cart.products[itemIndex] = product;
+       
         await cart.save();
-        res.status(200).send(cart);
+        res.json({
+          "success": true,
+          "code":200,
+          "message": " Successfully fetched cart of user",
+          "response": cart
+        });
       } else {
         cart.products.push({ productId, quantity, price,title,img,desc });
         cart.bill = cart.products.reduce((acc, curr) => {
@@ -48,7 +60,12 @@ router.post("/", verifyToken, async (req, res) => {
         },0)
 
         await cart.save();
-        res.status(200).send(cart);
+        res.json({
+          "success": true,
+          "code":200,
+          "message": "Successfully fetched cart of user",
+          "response": cart
+        });
       }
     } else {
       //no cart exists, create one
@@ -59,11 +76,21 @@ router.post("/", verifyToken, async (req, res) => {
         bill: quantity * price,
       });
       
-      return res.status(201).send(newCart);
+      res.json({
+        "success": true,
+        "code":200,
+        "message": "Successfully fetched cart of user",
+        "response": newCart
+      });
     }
   } catch (error) {
     console.log(error);
-    res.status(500).send("something went wrong");
+    res.json({
+      "success": false,
+      "code":500,
+      "message": "Some error occured",
+      "response": null
+    });
   }
 });
 
@@ -102,7 +129,8 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
   //GET USER CART
   router.get("/find", verifyToken, async (req, res) => {
    
-      const owner = req.user._id;
+    const owner = req.user._id;
+
 
       try {
         const cart = await Cart.findOne({ owner });
@@ -110,7 +138,7 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
           res.json({
             "success": true,
             "code":200,
-            "message": " Successfully fetched card of user",
+            "message": " Successfully fetched cart of user",
             "response": cart
           });
         } else {
@@ -118,7 +146,7 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
             "success": true,
             "code":200,
             "message": "Cart is Empty",
-            "response": null
+            "response": cart
           })
         }
       } catch (error) {

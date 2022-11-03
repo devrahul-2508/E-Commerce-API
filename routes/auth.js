@@ -18,8 +18,8 @@ const jwt = require("jsonwebtoken")
         const accessToken = jwt.sign({
          id: savedUser._id,
          isAdmin: savedUser.isAdmin
-       },process.env.JWT_SEC,
-       {expiresIn: "3d"}
+       },process.env.JWT_SEC
+      
        );
 
        savedUser = savedUser.toObject();
