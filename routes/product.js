@@ -52,26 +52,44 @@ router.put("/:id",verifyTokenAndAdmin,async(req,res)=>{
     })
 
     //GET PRODUCT
-    router.get("/find/:id",async (req,res)=>{
+    router.get("/find",async (req,res)=>{
         try{
-            const product = await Product.findById(req.params.id);
+            const product = await Product.findById(req.query.id);
 
-            res.status(200).json(product);
+            res.json({
+              "success": true,
+              "code": 200,
+              "message": "Successfully Fetched Product",
+              "response": product
+             })
         }catch(err){
-            res.status(500).json(err);
+
+          res.json({
+            "success": false,
+            "code": 500,
+            "message": "err",
+            "response": null
+           })
 
         }
     })
 
     //GET ALL PRODUCTS
 router.get("/", async (req, res) => {
-    const qNew = req.query.new;
+    const qTitle = req.query.title;
     const qCategory = req.query.category;
+    const page = req.query.page
     try {
       let products;
+      const limit = 2;
+
   
-      if (qNew) {
-        products = await Product.find().sort({ createdAt: -1 }).limit(1);
+      if (qTitle) {
+        
+
+        products = await Product.find({title: { '$regex': qTitle, '$options': 'i' }}, {});
+
+
       } else if (qCategory) {
         products = await Product.find({
           categories: {
@@ -81,10 +99,28 @@ router.get("/", async (req, res) => {
       } else {
         products = await Product.find();
       }
+
+      const startIndex = (page-1) * limit;
+      const endIndex = page * limit
+
+      products = products.slice(startIndex,endIndex)
+
+
   
-      res.status(200).json(products);
+      res.json({
+        "success": true,
+        "code": 200,
+        "message": "Successfully fetched all products",
+        "response": products
+      });
     } catch (err) {
-      res.status(500).json(err);
+      console.log(err);
+      res.status(500).json({
+        "success": false,
+        "code": 500,
+        "message": err,
+        "response": null
+      });
     }
   });
 
