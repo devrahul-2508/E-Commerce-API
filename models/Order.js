@@ -1,4 +1,6 @@
 const mongoose = require("mongoose");
+const { Schema } = mongoose;
+
 
 const OrderSchema = new mongoose.Schema(
   {
@@ -6,12 +8,16 @@ const OrderSchema = new mongoose.Schema(
     products: [
       {
         productId: {
-          type: String,
+          type: Schema.Types.ObjectId, ref: "Product"
         },
-        quantity: {
+        title: String,
+        desc: String,
+        img: String,
+       quantity: {
           type: Number,
           default: 1,
         },
+
       },
     ],
     amount: { type: Number, required: true },

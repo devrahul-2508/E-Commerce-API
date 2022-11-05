@@ -1,5 +1,6 @@
 const Order = require("../models/Order");
-const User = require("../models/User.js")
+const User = require("../models/User")
+const Product = require("../models/Product")
 const {
   verifyToken,
   verifyTokenAndAuthentication,
@@ -13,21 +14,60 @@ const router = require("express").Router();
 router.post("/", verifyToken, async (req, res) => {
   try{
 
-    const user = req.user.id;
+  const user = req.user.id;
   const {products,amount,address} = req.body
-  const newOrder = await Order.create({
-    userId: user,
-    products: products,
-    amount: amount,
-    address: address
-  })
 
-  res.json({
-    "success": true,
-    "code":200,
-    "message": "Successfully created order",
-    "response": newOrder
+  let newProducts=[]
+  var itemsProcessed = 0;
+  products.forEach(product => {
+  
+   console.log(product.productId);
+   Product.findById(product.productId,(err,result)=>{
+    if(err){
+      console.log(err);
+    }
+    else{
+     const productId = result._id
+     const title = result.title
+     const desc = result.desc
+     const img = result.img
+     const quantity = product.quantity
+     newProducts.push({productId,title,desc,img,quantity})
+
+     itemsProcessed++;
+     if(itemsProcessed === products.length) {
+       callback();
+     }
+    
+    }
+   });
+  async function callback(){
+    const newOrder = await Order.create({
+      userId: user,
+      products: newProducts,
+      amount: amount,
+      address: address
+    })
+
+    console.log(newOrder);
+
+  
+    res.json({
+      "success": true,
+      "code":200,
+      "message": "Successfully created order",
+      "response": newOrder
+    });
+  }
+
   });
+
+  
+
+  
+
+
+  
   }
   catch(err){
     console.log(err);
@@ -91,7 +131,7 @@ router.delete("/", verifyToken, async (req, res) => {
 router.get("/find", verifyToken, async (req, res) => {
     try {
       const user = req.user.id;
-      const orders = await Order.find({ userId: user});
+      const orders = await Order.find({userId: user})
       res.json({
         "success": true,
         "code":200,
@@ -107,6 +147,13 @@ router.get("/find", verifyToken, async (req, res) => {
         "response": null
       });
     }
+
+    Order.find({userId: user})
+.populate("productId")
+.then(p=>console.log(p))
+.catch(error=>console.log(error));
+    
+    
   });
 
   // GET MONTHLY INCOME

@@ -129,7 +129,7 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
   //GET USER CART
   router.get("/find", verifyToken, async (req, res) => {
    
-    const owner = req.user._id;
+    const owner = req.user.id;
 
 
       try {
