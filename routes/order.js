@@ -1,4 +1,5 @@
 const Order = require("../models/Order");
+const User = require("../models/User.js")
 const {
   verifyToken,
   verifyTokenAndAuthentication,
@@ -10,14 +11,34 @@ const router = require("express").Router();
 //CREATE
 
 router.post("/", verifyToken, async (req, res) => {
-  const newOrder = new Order(req.body);
+  try{
 
-  try {
-    const savedOrder = await newOrder.save();
-    res.status(200).json(savedOrder);
-  } catch (err) {
-    res.status(500).json(err);
+    const user = req.user.id;
+  const {products,amount,address} = req.body
+  const newOrder = await Order.create({
+    userId: user,
+    products: products,
+    amount: amount,
+    address: address
+  })
+
+  res.json({
+    "success": true,
+    "code":200,
+    "message": "Successfully created order",
+    "response": newOrder
+  });
   }
+  catch(err){
+    console.log(err);
+    res.json({
+      "success": false,
+      "code":500,
+      "message": "Order creation failed",
+      "response": null
+    });
+  }
+  
 });
 
 //UPDATE
@@ -37,22 +58,54 @@ router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
 });
 
 //DELETE
-router.delete("/:id", verifyTokenAndAdmin, async (req, res) => {
-  try {
-    await Order.findByIdAndDelete(req.params.id);
-    res.status(200).json("Order has been deleted...");
-  } catch (err) {
-    res.status(500).json(err);
-  }
+router.delete("/", verifyToken, async (req, res) => {
+    console.log(req.body._id);
+
+    try{
+      await Order.findOneAndDelete({_id:req.body._id});
+      res.json({
+        "success": true,
+        "code":200,
+        "message": "Successfully deleted order",
+        "response": null
+      });
+
+    }catch(err){
+      console.log(err);
+      res.json({
+        "success": false,
+        "code":500,
+        "message": "Order deletion failed",
+        "response": null
+      });
+    }
+
+   
+
+      
+   
+  
 });
 
 //GET USER ORDERS
-router.get("/find/:userId", verifyTokenAndAuthentication, async (req, res) => {
+router.get("/find", verifyToken, async (req, res) => {
     try {
-      const orders = await Order.find({ userId: req.params.userId });
-      res.status(200).json(orders);
+      const user = req.user.id;
+      const orders = await Order.find({ userId: user});
+      res.json({
+        "success": true,
+        "code":200,
+        "message": "Successfully fetched orders of user",
+        "response": orders
+      });
     } catch (err) {
-      res.status(500).json(err);
+      console.log(err);
+      res.json({
+        "success": false,
+        "code":500,
+        "message": "Orders cant be fetched",
+        "response": null
+      });
     }
   });
 
