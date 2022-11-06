@@ -32,7 +32,8 @@ router.post("/", verifyToken, async (req, res) => {
      const desc = result.desc
      const img = result.img
      const quantity = product.quantity
-     newProducts.push({productId,title,desc,img,quantity})
+     const price = result.price
+     newProducts.push({productId,title,desc,img,price,quantity})
 
      itemsProcessed++;
      if(itemsProcessed === products.length) {
@@ -130,8 +131,16 @@ router.delete("/", verifyToken, async (req, res) => {
 //GET USER ORDERS
 router.get("/find", verifyToken, async (req, res) => {
     try {
+      const page = req.query.page
       const user = req.user.id;
-      const orders = await Order.find({userId: user})
+      let orders;
+      const limit = 2;
+      orders = await Order.find({userId: user})
+
+      const startIndex = (page-1) * limit;
+      const endIndex = page * limit
+
+      orders = orders.slice(startIndex,endIndex)
       res.json({
         "success": true,
         "code":200,
@@ -148,10 +157,7 @@ router.get("/find", verifyToken, async (req, res) => {
       });
     }
 
-    Order.find({userId: user})
-.populate("productId")
-.then(p=>console.log(p))
-.catch(error=>console.log(error));
+ 
     
     
   });

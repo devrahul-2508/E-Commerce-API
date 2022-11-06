@@ -7,11 +7,12 @@ const router = require("express").Router();
 
 //add cart
 router.post("/", verifyToken, async (req, res) => {
-  const owner = req.user.id;
+  
+  try {
+    const owner = req.user.id;
   console.log(owner);
   const { productId, quantity } = req.body;
   console.log(productId);
-  try {
     const cart = await Cart.findOne({ userId: owner});
     const item = await Item.findOne({ _id: productId});
 
