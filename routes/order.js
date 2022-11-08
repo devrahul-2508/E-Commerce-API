@@ -83,16 +83,21 @@ router.post("/", verifyToken, async (req, res) => {
 });
 
 //UPDATE
-router.put("/:id", verifyTokenAndAdmin, async (req, res) => {
+router.put("/", verifyTokenAndAdmin, async (req, res) => {
   try {
     const updatedOrder = await Order.findByIdAndUpdate(
-      req.params.id,
+      req.body._id,
       {
         $set: req.body,
       },
       { new: true }
     );
-    res.status(200).json(updatedOrder);
+    res.json({
+      "success": true,
+      "code":200,
+      "message": "Successfully updated order",
+      "response": updatedOrder
+    });
   } catch (err) {
     res.status(500).json(err);
   }
