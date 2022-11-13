@@ -1,5 +1,6 @@
 const Order = require("../models/Order");
 const User = require("../models/User")
+const Cart = require("../models/Cart")
 const Product = require("../models/Product")
 const {
   verifyToken,
@@ -51,6 +52,11 @@ router.post("/", verifyToken, async (req, res) => {
     })
 
     console.log(newOrder);
+    
+    const cart = await Cart.findOne({ userId: user});
+
+    cart.products = []
+    await cart.save()
 
   
     res.json({
@@ -140,7 +146,7 @@ router.get("/find", verifyToken, async (req, res) => {
       const user = req.user.id;
       let orders;
       const limit = 2;
-      orders = await Order.find({userId: user})
+      orders = await Order.find({userId: user}).sort({createdAt: -1})
 
       const startIndex = (page-1) * limit;
       const endIndex = page * limit
