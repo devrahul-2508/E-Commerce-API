@@ -7,6 +7,7 @@ const {
   verifyTokenAndAuthentication,
   verifyTokenAndAdmin,
 } = require("./verifyToken");
+const { route } = require("./auth");
 
 const router = require("express").Router();
 
@@ -56,6 +57,7 @@ router.post("/", verifyToken, async (req, res) => {
     const cart = await Cart.findOne({ userId: user});
 
     cart.products = []
+    cart.bill = 0
     await cart.save()
 
   
@@ -138,6 +140,32 @@ router.delete("/", verifyToken, async (req, res) => {
    
   
 });
+
+//GET USER ORDER
+
+router.get("/",verifyToken,async(req,res)=>{
+
+  try{
+   let order = await Order.findById(req.query.id)
+
+   res.json({
+    "success": true,
+    "code":200,
+    "message": "Successfully retrieved order of User",
+    "response": order
+  });
+  }
+  catch(e){ 
+    console.log(err);
+    res.json({
+      "success": false,
+      "code":500,
+      "message": "Order can't be retrieved",
+      "response": null
+    });
+  }
+
+})
 
 //GET USER ORDERS
 router.get("/find", verifyToken, async (req, res) => {
