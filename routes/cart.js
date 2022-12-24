@@ -1,6 +1,6 @@
 const Cart = require("../models/Cart")
 const Item = require("../models/Product")
-const { verifyToken, verifyTokenAndAuthentication, verifyTokenAndAdmin } = require("./verifyToken")
+const { verifyToken, verifyTokenAndAuthentication, verifyTokenAndAdmin } = require("../middleware/verifyToken")
 const router = require("express").Router();
 
 
@@ -160,7 +160,40 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
       }
     });
 
-  module.exports = router
+
+    router.get("/findv1", verifyToken, async (req, res) => {
+   
+
+
+      try {
+        const owner = req.user.id;
+        const cart = await Cart.findOne({ owner }).populate('productby');
+        if (cart && cart.products.length > 0) {
+          res.json({
+            "success": true,
+            "code":200,
+            "message": " Successfully fetched cart of user",
+            "response": cart
+          });
+        } else {
+          res.json({
+            "success": true,
+            "code":200,
+            "message": "Cart is Empty",
+            "response": cart
+          })
+        }
+      } catch (error) {
+        console.log(error);
+        res.json({
+          "success": false,
+          "code":500,
+          "message": "Some error occured",
+          "response": null
+        });
+      }
+    });
+
 
 //GET ALL CARTS
 
@@ -174,3 +207,5 @@ router.get("/",verifyTokenAndAdmin,async (req,res)=>{
 
   }
 })
+
+module.exports = router

@@ -24,6 +24,10 @@ const CartSchema = new mongoose.Schema(
         price: Number
       },
     ],
+    productby:{
+      type: Schema.Types.ObjectId, ref: "Product",
+
+    },
     bill: {
       type: Number,
       required: true,
