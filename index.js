@@ -7,6 +7,7 @@ const authRoute = require("./routes/auth")
 const productRoute = require("./routes/product")
 const cartRoute = require("./routes/cart")
 const orderRoute = require("./routes/order")
+const mainModelRoute = require("./routes/mainModels")
 const uploadRoute = require("./middleware/imageUpload")
 const fileUpload = require("express-fileupload")
 const path = require("path");
@@ -32,6 +33,8 @@ app.use("/api/auth",authRoute);
 app.use("/api/products",productRoute);
 app.use("/api/carts",cartRoute);
 app.use("/api/orders",orderRoute);
+app.use("/api/mainModels",mainModelRoute)
+
 
 
 

@@ -5,7 +5,6 @@ const upload = require("../middleware/imageUpload");
 const cloudinary = require("../config/cloudinary.config")
 const TrendingProducts = require("../models/TrendingProducts");
 const TopSellingProducts = require("../models/TopSellingProducts");
-const MainModels = require("../models/MainModels");
 const router = require("express").Router();
 require('dotenv').config()
 const fs = require("fs");
@@ -165,110 +164,7 @@ router.get("/", async (req, res) => {
     }
   });
 
-  router.post("/tp",async function(req,res){
-    const newTrendingProduct = new TrendingProducts(req.body);
-
-    try{
-      let result = await newTrendingProduct.save()
-      res.json({
-        "success": true,
-        "code": 200,
-        "message": "Successfully added",
-        "response": result
-      })
-    }
-    catch(err){
-      console.log(err);
-    }
-
-    
-  })
-
-
-  router.get("/tp",async function(req,res){
-    let products = await TrendingProducts.find().populate('products');
-    console.log(products);
-
-    res.json({
-      "success": true,
-      "code": 200,
-      "message": "Successfully added",
-      "response": products
-    })
-
-  })
-
-  router.post("/ts",async function(req,res){
-    const newTopSellingProduct = new TopSellingProducts(req.body);
-
-    try{
-      let result = await newTopSellingProduct.save()
-      res.json({
-        "success": true,
-        "code": 200,
-        "message": "Successfully added",
-        "response": result
-      })
-    }
-    catch(err){
-      console.log(err);
-    }
-
-    
-  })
-
-
-  router.get("/ts",async function(req,res){
-    let products = await TopSellingProducts.find().populate('products');
-    console.log(products);
-
-    res.json({
-      "success": true,
-      "code": 200,
-      "message": "Successfully added",
-      "response": products
-    })
-
-  })
-
-
-  router.get("/mainmodels",async function(req,res){
-
-    try{
-
-      let models = await MainModels.find().populate(
-     [
-      {
-        path: 'topSellingProductModel',
-     populate: {
-       path: 'products',
-       model: 'Product'
-     } 
-      },
-      {
-        path: 'trendingProductModel',
-     populate: {
-       path: 'products',
-       model: 'Product'
-     } 
-      }
-     ]
-      
-     
-   )
-    res.json({
-      "success": true,
-      "code": 200,
-      "message": "Successfully fetched",
-      "response": models
-    })
-
-  }catch(err){
-    console.log(err);
-  }
-})
-
-
+  
 
     
     
