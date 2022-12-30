@@ -8,10 +8,16 @@ const productRoute = require("./routes/product")
 const cartRoute = require("./routes/cart")
 const orderRoute = require("./routes/order")
 const uploadRoute = require("./middleware/imageUpload")
-
+const fileUpload = require("express-fileupload")
+const path = require("path");
 
 
 app.use(express.json());
+app.use(fileUpload({
+    debug:true,
+    useTempFiles:true,
+    tempFileDir:path.join(__dirname,"./tmp")
+}))
 
 app.get("/test",(req,res)=>{
     res.send("Hello World")

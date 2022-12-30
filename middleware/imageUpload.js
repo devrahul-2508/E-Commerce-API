@@ -1,33 +1,21 @@
-const multer = require('multer')
-const MulterGridfsStorage = require('multer-gridfs-storage')
-const path = require('path')
-
-var storage = multer.diskStorage({
-    destination: function(req,file,cb){
-        cb(null,'./uploads')
-    },
-    filename: function(req,file,cb){
-        let ext = path.extname(file.originalname)
-        cb(null,Date.now()+ext)
-    }
-})
+const cloudinary = require('cloudinary').v2;
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const express = require('express');
+const multer = require('multer');
+ 
+ 
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'ProductImages',
+    format: async (req, file) => ["jpg","png","jpeg/"], // supports promises as well
+    public_id: (req, file) => 'computed-filename-using-request',
+  },
+});
+ 
 
 var upload = multer({
-    storage: storage,
-    fileFilter: function(req,file,callback){
-        if(
-            file.mimetype == "image/png" ||
-            file.mimetype == "image/jpg"
-        ){
-            callback(null,true)
-        }else{
-            console.log("Only jpg and png format supported");
-            callback(null,false)
-        }
-    },
-    limits:{
-        fileSize: 1024 * 1024 * 2
-    }
+    storage: storage
 })
 
 module.exports = upload;
