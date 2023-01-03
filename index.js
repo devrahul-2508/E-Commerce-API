@@ -25,8 +25,9 @@ app.get("/test",(req,res)=>{
 })
 
 
-
-mongoose.connect("mongodb://localhost:27017/shopDB");
+let username = process.env.USER_NAME
+let password = process.env.PASSWORD
+mongoose.connect("mongodb+srv://"+username+":"+password+"@cluster0.hehvlg7.mongodb.net/shopDB")
 app.use("/uploads",express.static("uploads"));
 app.use("/api/users",userRoute);
 app.use("/api/auth",authRoute);

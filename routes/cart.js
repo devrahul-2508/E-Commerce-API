@@ -18,6 +18,16 @@ router.post("/", verifyToken, async (req, res) => {
 
     console.log(cart);
 
+    if (!owner) {
+      res.json({
+        "success": false,
+        "code":500,
+        "message": "User not found",
+        "response": null
+      });
+      return
+    }
+
     if (!item) {
       res.status(404).send({ message: "item not found" });
       return;
@@ -134,7 +144,7 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
 
       try {
         const owner = req.user.id;
-        const cart = await Cart.findOne({ owner });
+        const cart = await Cart.findOne({ userId: owner });
         if (cart && cart.products.length > 0) {
           res.json({
             "success": true,
@@ -144,8 +154,8 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
           });
         } else {
           res.json({
-            "success": true,
-            "code":200,
+            "success": false,
+            "code":500,
             "message": "Cart is Empty",
             "response": cart
           })

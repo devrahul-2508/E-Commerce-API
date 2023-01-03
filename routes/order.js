@@ -169,13 +169,13 @@ router.get("/find", verifyToken, async (req, res) => {
     try {
       const page = req.query.page
       const user = req.user.id;
+      console.log(user);
       let orders;
       const limit = 2;
-      orders = await Order.find({userId: user}).sort({createdAt: -1})
-
       const startIndex = (page-1) * limit;
       const endIndex = page * limit
-
+     
+      orders = await Order.find({userId: user}).sort({createdAt: -1})
       orders = orders.slice(startIndex,endIndex)
       res.json({
         "success": true,
