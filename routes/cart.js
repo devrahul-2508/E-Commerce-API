@@ -145,7 +145,7 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
       try {
         const owner = req.user.id;
         const cart = await Cart.findOne({ userId: owner });
-        if (cart && cart.products.length > 0) {
+        if (cart) {
           res.json({
             "success": true,
             "code":200,
