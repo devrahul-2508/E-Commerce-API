@@ -1,6 +1,6 @@
 const Cart = require("../models/Cart")
 const Item = require("../models/Product")
-const { verifyToken, verifyTokenAndAuthentication, verifyTokenAndAdmin } = require("./verifyToken")
+const { verifyToken, verifyTokenAndAuthentication, verifyTokenAndAdmin } = require("../middleware/verifyToken")
 const router = require("express").Router();
 
 
@@ -17,6 +17,16 @@ router.post("/", verifyToken, async (req, res) => {
     const item = await Item.findOne({ _id: productId});
 
     console.log(cart);
+
+    if (!owner) {
+      res.json({
+        "success": false,
+        "code":500,
+        "message": "User not found",
+        "response": null
+      });
+      return
+    }
 
     if (!item) {
       res.status(404).send({ message: "item not found" });
@@ -134,7 +144,40 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
 
       try {
         const owner = req.user.id;
-        const cart = await Cart.findOne({ owner });
+        const cart = await Cart.findOne({ userId: owner });
+        if (cart) {
+          res.json({
+            "success": true,
+            "code":200,
+            "message": " Successfully fetched cart of user",
+            "response": cart
+          });
+        } else {
+          res.json({
+            "success": false,
+            "code":500,
+            "message": "Cart is Empty",
+            "response": cart
+          })
+        }
+      } catch (error) {
+        res.json({
+          "success": false,
+          "code":500,
+          "message": "Some error occured",
+          "response": null
+        });
+      }
+    });
+
+
+    router.get("/findv1", verifyToken, async (req, res) => {
+   
+
+
+      try {
+        const owner = req.user.id;
+        const cart = await Cart.findOne({ owner }).populate('productby');
         if (cart && cart.products.length > 0) {
           res.json({
             "success": true,
@@ -151,6 +194,7 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
           })
         }
       } catch (error) {
+        console.log(error);
         res.json({
           "success": false,
           "code":500,
@@ -160,7 +204,6 @@ router.delete("/:id", verifyTokenAndAuthentication, async (req, res) => {
       }
     });
 
-  module.exports = router
 
 //GET ALL CARTS
 
@@ -174,3 +217,5 @@ router.get("/",verifyTokenAndAdmin,async (req,res)=>{
 
   }
 })
+
+module.exports = router

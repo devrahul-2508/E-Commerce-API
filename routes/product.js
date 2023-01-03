@@ -1,19 +1,59 @@
 const Product = require("../models/Product");
 
-const { verifyToken, verifyTokenAndAuthentication, verifyTokenAndAdmin } = require("./verifyToken")
+const { verifyToken, verifyTokenAndAuthentication, verifyTokenAndAdmin } = require("../middleware/verifyToken");
+const upload = require("../middleware/imageUpload");
+const cloudinary = require("../config/cloudinary.config")
+const TrendingProducts = require("../models/TrendingProducts");
+const TopSellingProducts = require("../models/TopSellingProducts");
 const router = require("express").Router();
+require('dotenv').config()
+const fs = require("fs");
 
 //CREATE PRODUCT
 
 router.post("/",verifyTokenAndAdmin, async(req,res)=>{
-    const newProduct = new Product(req.body);
+    
+  
+  
+  
 
     try{
+const result = await cloudinary.uploader.upload(req.files.img.tempFilePath,{
+        folder: 'ProductImages',
+        // width:300,
+        // crop:"scale"
+      })
+
+
+      const newProduct = new Product({
+        title : req.body.title,
+        desc: req.body.desc,
+        categories:req.body.categories,
+        size:req.body.size,
+        color:req.body.color,
+        price:req.body.price,
+        img: result.url
+      })
+
+       
+
+
         const savedProduct = await newProduct.save();
-        res.status(200).json(savedProduct);
+        fs.unlink(req.files.img.tempFilePath,(err)=>{
+          if(err){
+            console.log(err);
+          }
+        })
+        res.json({
+          "success": true,
+          "code": 200,
+          "message": "Successfully Added Product",
+          "response": savedProduct
+         })
 
     }
     catch(err){
+      console.log(err);
         res.status(500).json(err);
 
     }
@@ -123,6 +163,8 @@ router.get("/", async (req, res) => {
       });
     }
   });
+
+  
 
     
     

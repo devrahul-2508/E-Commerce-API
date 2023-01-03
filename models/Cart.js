@@ -6,8 +6,7 @@ const { Schema } = mongoose;
 const CartSchema = new mongoose.Schema(
   {
     userId:{
-      type:String,
-      required: true
+     type: Schema.Types.ObjectId,ref: "User"
     },
     products: [
       {
@@ -24,6 +23,10 @@ const CartSchema = new mongoose.Schema(
         price: Number
       },
     ],
+    productby:{
+      type: Schema.Types.ObjectId, ref: "Product",
+
+    },
     bill: {
       type: Number,
       required: true,
