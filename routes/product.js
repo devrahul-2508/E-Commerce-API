@@ -8,6 +8,7 @@ const TopSellingProducts = require("../models/TopSellingProducts");
 const router = require("express").Router();
 require('dotenv').config()
 const fs = require("fs");
+const { stringify } = require("querystring");
 
 //CREATE PRODUCT
 
@@ -54,7 +55,12 @@ const result = await cloudinary.uploader.upload(req.files.img.tempFilePath,{
     }
     catch(err){
       console.log(err);
-        res.status(500).json(err);
+      res.json({
+        "success": false,
+        "code": 500,
+        "message": stringify(err),
+        "response": null
+       })
 
     }
 })
