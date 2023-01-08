@@ -5,6 +5,7 @@ const Product = require("../models/Product")
 const { verifyToken, verifyTokenAndAuthentication, verifyTokenAndAdmin } = require("../middleware/verifyToken")
 
 const { route } = require("./auth");
+const { mode } = require("crypto-js");
 
 const router = require("express").Router();
 
@@ -14,7 +15,7 @@ router.post("/", verifyToken, async (req, res) => {
   try{
 
   const user = req.user.id;
-  const {products,amount,address} = req.body
+  const {products,amount,address,modeOfPayment} = req.body
 
   let newProducts=[]
   var itemsProcessed = 0;
@@ -46,7 +47,8 @@ router.post("/", verifyToken, async (req, res) => {
       userId: user,
       products: newProducts,
       amount: amount,
-      address: address
+      address: address,
+      modeOfPayment: modeOfPayment
     })
 
     console.log(newOrder);
