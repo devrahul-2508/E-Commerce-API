@@ -17,7 +17,7 @@ app.use(express.json());
 app.use(fileUpload({
     debug:true,
     useTempFiles:true,
-    tempFileDir:path.join(__dirname,"/tmp")
+    tempFileDir:path.join(__dirname,"tmp")
 }))
 
 app.get("/",(req,res)=>{
